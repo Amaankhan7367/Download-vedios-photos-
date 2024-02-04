@@ -1,25 +1,34 @@
-const fileInput = document.querySelector("input"),
-downloadBtn = document.querySelector("button");
+$(document).ready(function() {
+  
+  $(".btn").click(function() {
 
-downloadBtn.addEventListener("click", e => {
-    e.preventDefault();
-    downloadBtn.innerText = "Downloading file...";
-    fetchFile(fileInput.value);
-});
-
-function fetchFile(url) {
-    fetch(url).then(res => res.blob()).then(file => {
-        let tempUrl = URL.createObjectURL(file);
-        const aTag = document.createElement("a");
-        aTag.href = tempUrl;
-        aTag.download = url.replace(/^.*[\\\/]/, '');
-        document.body.appendChild(aTag);
-        aTag.click();
-        downloadBtn.innerText = "Download File";
-        URL.revokeObjectURL(tempUrl);
-        aTag.remove();
-    }).catch(() => {
-        alert("Failed to download file!");
-        downloadBtn.innerText = "Download File";
+    $.ajax({
+       url:"https://cors-anywhere.herokuapp.com/" + $("input").val(),
+       type:'GET',
+       datatype: "jsonp",
+       crossDomain: true,
+       success: function(data){
+         if ($(data).filter('meta[property="og:video"]').attr("content") ) {
+           var downloadlink = $(data).filter('meta[property="og:video"]').attr("content");
+           var a = $("<a>")
+            .attr("href", downloadlink)
+            .attr("download", "video.mp4")
+            .appendTo("body");
+            a[0].click();
+            a.remove();
+         } else {
+           var downloadlink = $(data).filter('meta[property="og:image"]').attr("content");
+           var a = $("<a>")
+            .attr("href", downloadlink)
+            .attr("download", "img.png")
+            .appendTo("body");
+            a[0].click();
+            a.remove();
+         }
+           
+       }
     });
-}
+    
+  });
+  });
+ 
